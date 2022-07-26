@@ -1,0 +1,297 @@
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.awt.event.*;
+import java.util.List;
+import java.awt.image.*;
+import java.net.URL;
+import javax.imageio.*;
+import java.io.*;
+
+public class Gui extends JFrame{
+
+    //public String cardSearch;
+    public List<String> theList;
+    public JLabel imageLabel;
+    public List<MagicCard> queryCardSearchList;
+    public List<String> queryCardList;
+	private JPanel contentPane;
+	private JTextField querySearchBar;
+
+    public Gui(final CardCollection collection){
+	
+    	/*
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	setBounds(100, 100, 800, 500);
+	contentPane = new JPanel();
+	contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+	contentPane.setLayout(new BorderLayout(0, 0));
+	setContentPane(contentPane);
+	
+	JPanel DeckListPanel = new JPanel();
+	contentPane.add(DeckListPanel, BorderLayout.WEST);
+	GridBagLayout gbl_DeckListPanel = new GridBagLayout();
+	gbl_DeckListPanel.columnWidths = new int[]{43, 0};
+	gbl_DeckListPanel.rowHeights = new int[]{14, 48, 0};
+	gbl_DeckListPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+	gbl_DeckListPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+	DeckListPanel.setLayout(gbl_DeckListPanel);
+	
+	JLabel DeckListLabel = new JLabel("Deck List");
+	GridBagConstraints gbc_DeckListLabel = new GridBagConstraints();
+	gbc_DeckListLabel.anchor = GridBagConstraints.NORTH;
+	gbc_DeckListLabel.insets = new Insets(0, 0, 5, 0);
+	gbc_DeckListLabel.gridx = 0;
+	gbc_DeckListLabel.gridy = 0;
+	DeckListPanel.add(DeckListLabel, gbc_DeckListLabel);
+	
+	
+	//Card List
+	JList<String> deckCardsList = new JList<String>();
+	theList = new ArrayList<String>();
+	addMagicCardsToList(collection);
+	deckCardsList.setModel(new AbstractListModel<String>() {
+		String[] values = theList.toArray(new String[0]);
+		public int getSize() {
+			return values.length;
+		}
+		public String getElementAt(int index) {
+			return values[index];
+		}
+	});
+	GridBagConstraints gbc_DeckCardsList = new GridBagConstraints();
+	gbc_DeckCardsList.gridx = 0;
+	gbc_DeckCardsList.gridy = 1;
+	DeckListPanel.add(deckCardsList, gbc_DeckCardsList);
+	
+	//QUERY REGION
+	
+	JPanel QueryCardPanel = new JPanel();
+	contentPane.add(QueryCardPanel, BorderLayout.EAST);
+	GridBagLayout gbl_QueryCardPanel = new GridBagLayout();
+	gbl_QueryCardPanel.columnWidths = new int[]{96, 0};
+	gbl_QueryCardPanel.rowHeights = new int[]{14, 20, 0, 0};
+	gbl_QueryCardPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+	gbl_QueryCardPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+	QueryCardPanel.setLayout(gbl_QueryCardPanel);
+	
+	JLabel QueryCardLabel = new JLabel("Card Search");
+	GridBagConstraints gbc_QueryCardLabel = new GridBagConstraints();
+	gbc_QueryCardLabel.insets = new Insets(0, 0, 5, 0);
+	gbc_QueryCardLabel.gridx = 0;
+	gbc_QueryCardLabel.gridy = 0;
+	QueryCardPanel.add(QueryCardLabel, gbc_QueryCardLabel);
+	
+	searchBar = new JTextField();
+	GridBagConstraints gbc_textField = new GridBagConstraints();
+	gbc_textField.insets = new Insets(0, 0, 5, 0);
+	gbc_textField.anchor = GridBagConstraints.SOUTHWEST;
+	gbc_textField.gridx = 0;
+	gbc_textField.gridy = 1;
+	QueryCardPanel.add(searchBar, gbc_textField);
+	searchBar.setColumns(10);
+	
+	//THE QUERY LIST
+	queryCardList = new ArrayList<String>();
+	queryCardSearchList = new ArrayList<MagicCard>();
+	
+	JList<String> qL = new JList<String>();
+	qL.setModel(new AbstractListModel<String>() {
+		String[] values = {};
+		public int getSize() {
+			return values.length;
+		}
+		public String getElementAt(int index) {
+			return values[index];
+		}	
+	});
+	
+	GridBagConstraints gbc_list = new GridBagConstraints();
+	gbc_list.fill = GridBagConstraints.BOTH;
+	gbc_list.gridx = 0;
+	gbc_list.gridy = 2;
+	QueryCardPanel.add(qL, gbc_list);
+	
+	JPanel CardImagePanel = new JPanel();
+	contentPane.add(CardImagePanel, BorderLayout.CENTER);
+	CardImagePanel.setLayout(null);
+	
+	JLabel cardImage = new JLabel("");
+	cardImage.setBounds(54,0,400,400);
+	CardImagePanel.add(cardImage);
+	
+	*/
+    	
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 800, 500);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+		//Center Image Panel
+		JPanel CardImagePanel = new JPanel();
+		contentPane.add(CardImagePanel, BorderLayout.CENTER);
+		CardImagePanel.setLayout(null);
+		
+		JLabel cardImage = new JLabel("");
+		cardImage.setBounds(235, 15, 335, 400);
+		CardImagePanel.add(cardImage);
+		//End of Center Image Panel
+		
+		//Query Panel
+		JPanel queryCardPanel = new JPanel();
+		queryCardPanel.setBounds(570, 2, 230, 350);
+		CardImagePanel.add(queryCardPanel);
+		queryCardPanel.setLayout(null);
+		
+		JLabel queryCardLabel = new JLabel("Card Search");
+		queryCardLabel.setBounds(55, 2, 75, 14);
+		queryCardPanel.add(queryCardLabel);
+		
+		querySearchBar = new JTextField();
+		querySearchBar.setBounds(45, 19, 230, 20);
+		queryCardPanel.add(querySearchBar);
+		querySearchBar.setColumns(10);
+		
+		//Query Temp list
+		queryCardList = new ArrayList<String>();
+		queryCardSearchList = new ArrayList<MagicCard>();
+		
+		JList<String> qL = new JList<String>();
+		qL.setBounds(5, 44, 230, 350);
+		qL.setModel(new AbstractListModel<String>() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public String getElementAt(int index) {
+				return values[index];
+			}
+		});
+		queryCardPanel.add(qL);
+
+		
+		//End of Query Panel
+		
+		//Deck List Panel
+		JPanel deckListPanel = new JPanel();
+		deckListPanel.setBounds(5, 2, 230, 350);
+		CardImagePanel.add(deckListPanel);
+		deckListPanel.setLayout(null);
+		
+		JLabel deckListLabel = new JLabel("Deck List");
+		deckListLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		deckListLabel.setBounds(80, 2, 59, 14);
+		deckListPanel.add(deckListLabel);
+
+		//Card List
+		JList<String> deckCardsList = new JList<String>();
+		deckCardsList.setBounds(0, 20, 230, 350);
+		deckListPanel.add(deckCardsList);
+		//Model of List
+		theList = new ArrayList<String>();
+		addMagicCardsToList(collection);
+		deckCardsList.setModel(new AbstractListModel<String>() {
+			String[] values = theList.toArray(new String[0]);
+			public int getSize() {
+				return values.length;
+			}
+			public String getElementAt(int index) {
+				return values[index];
+			}
+		});
+		
+    	//End of Deck List Panel
+    	
+    querySearchBar.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(querySearchBar.getText().isEmpty()){
+                queryCardList.clear();
+                queryCardSearchList.clear();
+            }else {
+	            queryCardList.clear();
+	            queryCardSearchList.clear();
+	            Scraper scraper = new Scraper();
+	            queryCardSearchList = scraper.queryCards(querySearchBar.getText());
+	            addQueriedMagicCardsToQueryList(queryCardSearchList);
+            	qL.setModel(new AbstractListModel<String>() {
+            		String[] values = queryCardList.toArray(new String[0]);
+            		public int getSize() {
+            			return values.length;
+            		}
+            		public String getElementAt(int index) {
+            			return values[index];
+            		}
+            	});
+            }
+        }
+    });
+
+    MouseListener qlListListener = new MouseAdapter() {
+        public void mouseClicked(MouseEvent mouseEvent) {
+            JList<MagicCard> qL = (JList) mouseEvent.getSource();
+            if (mouseEvent.getClickCount() == 2) {
+                int index = qL.locationToIndex(mouseEvent.getPoint());
+                if (index >= 0) {
+                    try {
+                        cardImage.setIcon(new ImageIcon(resize(new URL(queryCardSearchList.get(index).cardImage), new Dimension(330,400))));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    };
+
+    deckCardsList.addListSelectionListener(new ListSelectionListener() {
+		
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+            if (!e.getValueIsAdjusting()) {
+            	int index = deckCardsList.getSelectedIndex();
+            	if(index > -1) {
+                    try {
+                        cardImage.setIcon(new ImageIcon(resize(new URL(collection.cardList.get(index).cardImage), new Dimension(330,400))));
+                    } catch (IOException e1) {
+                        throw new RuntimeException(e1);
+                    }
+            	}
+            }
+		}
+	});
+
+    qL.addMouseListener(qlListListener);
+    }
+
+
+	public void addMagicCardsToList(CardCollection collection){
+        for(int i=0;i<collection.cardList.size();i++){
+            theList.add(collection.getCard(i).cardName + "    Price: " + collection.getCard(i).price);
+        }
+    }
+	
+	public void addQueriedMagicCardsToQueryList(List<MagicCard> magicCards) {
+		for(int i=0;i<magicCards.size();i++) {
+			queryCardList.add(magicCards.get(i).cardName + "    Price: " + magicCards.get(i).price);
+		}
+	}
+
+    public BufferedImage resize(final URL url, final Dimension size) throws IOException{
+        final BufferedImage image = ImageIO.read(url);
+        final BufferedImage resized = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = resized.createGraphics();
+        g.drawImage(image, 0, 0, size.width, size.height, null);
+        g.dispose();
+        return resized;
+    }
+
+}

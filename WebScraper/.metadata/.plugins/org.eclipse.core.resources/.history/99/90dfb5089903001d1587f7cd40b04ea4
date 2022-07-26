@@ -1,0 +1,20 @@
+
+import java.util.*;
+
+public class Main {
+
+    public static void main (String args[]) {
+
+    	//Create a list of magic cards.
+        CardCollection cardList = new CardCollection();
+        //Instantiate the scraper.
+        Scraper scraper = new Scraper();
+        
+        cardList.writeToCollection(scraper.getCard("charcoal").url);
+        cardList.writeToCollection(scraper.getCard("ghalta").url);
+        cardList.writeToCollection(scraper.getCard("polyraptor").url);
+        cardList.writeToCollection(scraper.getCard("wakening avatar").url);
+
+        Gui gui = new Gui(cardList);
+    }
+}

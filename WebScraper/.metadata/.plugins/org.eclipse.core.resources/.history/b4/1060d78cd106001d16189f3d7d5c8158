@@ -1,0 +1,153 @@
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
+
+import java.io.*; // Only needed if scraping a local File.
+import java.util.*;
+import java.util.List;
+
+public class Scraper {
+
+    public Document doc = null;
+
+    public Scraper(){
+
+    }
+
+    public Scraper(List<MagicCard> cards) {
+        if(cards.size() > 0) {
+            System.out.println("Scraping process initiated: " + cards.size());
+            for (int i = 0; i < cards.size(); i++) {
+                try {
+                    doc = Jsoup.connect(cards.get(i).getURL()).get();
+                    cards.get(i).cardName = getCardName(doc);
+                    cards.get(i).price = getPrice(doc);
+                    cards.get(i).description = getDescription(doc);
+                    cards.get(i).cardImage = getCardImage(doc);
+
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                System.out.println("Scraping progress: [" + i + "]");
+            }
+        }
+    }
+
+    public void printCards(){
+
+    }
+
+
+    public List<MagicCard> queryCards(String query){
+        List<MagicCard> list = new ArrayList<MagicCard>();
+        Document queryDoc;
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+
+            if(doc.title().contains("Search")){
+                Elements cards = doc.getElementsByClass("card-grid-item");
+                int index = 0;
+                while(index < 10 && index < cards.size()){
+                    MagicCard card = new MagicCard("");
+                    String href = cards.get(index).text();
+                    try{
+                        queryDoc = Jsoup.connect("https://scryfall.com/search?q=" + href).get();
+                        card.cardName = getCardName(queryDoc);
+                        card.price = getPrice(queryDoc);
+                        card.description = getDescription(queryDoc);
+                        card.cardImage = getCardImage(queryDoc);
+                        card.url = getCardImage(queryDoc);
+                        System.out.println("Received: " + card.cardName);
+                        list.add(card);
+                        index++;
+                    }catch(Exception ex){
+                        System.out.println(ex.toString());
+                    }
+                }
+            }else {
+            	//We have found the card you are looking for
+            	MagicCard card = new MagicCard("");
+            	System.out.println("Document URL: " + doc.baseUri());
+                card.cardName = getCardName(doc);
+                card.price = getPrice(doc);
+                card.description = getDescription(doc);
+                card.cardImage = getCardImage(doc);
+                card.url = getCardImage(doc);
+                list.add(card);
+            }
+        }catch(Exception ex){
+            System.out.println(ex.toString());
+        }
+        System.out.println("completed.");
+        return list;
+    }
+
+    public MagicCard getCard(String query){
+        MagicCard card = new MagicCard();
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+            card.cardName = getCardName(doc);
+            card.price = getPrice(doc);
+            card.description = getDescription(doc);
+            card.cardImage = getCardImage(doc);
+            card.url = getCardImage(doc);
+        }catch(Exception ex){
+            System.out.println(ex.toString());
+        }
+        System.out.println("completed.");
+        return card;
+    }
+
+    public String getCardImage(Document doc){
+        String cardImage = null;
+        Elements image = doc.getElementsByTag("img");
+        cardImage = image.first().attr("src");
+        //System.out.println(image.first().attr("src"));
+        return cardImage;
+    }
+
+    public String getCardName(Document doc){
+        String cardName = "";
+        try {
+        Elements name = doc.getElementsByClass("card-text-card-name");
+        cardName = name.get(0).ownText();
+        return cardName;
+        }
+        catch(Exception ex) {
+        	return ex.toString();
+        }
+        //System.out.println(cardName);
+    }
+
+    public String getDescription(Document doc){
+        String cardDescription = "";
+        Elements price = doc.getElementsByClass("card-text-oracle");
+        cardDescription = price.get(0).text();
+
+        //System.out.println(cardDescription);
+        return cardDescription;
+    }
+
+    public String getPrice(Document doc){
+        String cardPrice = "";
+        String lowestPrice = "";
+        Elements price = doc.getElementsByClass("currency-usd");
+        //Grab the cheapest price.
+        for(int i=0;i<price.size();i++) {
+        	//Get the string for the price.
+        	int cardPriceStrLength = price.get(i).text().length();
+        	cardPrice = price.get(i).text().substring(price.get(i).text().indexOf("$") + 1,cardPriceStrLength);
+        	
+            if(lowestPrice.isEmpty()) {
+            	lowestPrice = cardPrice;
+            }
+            else if(Float.parseFloat(cardPrice) < Float.parseFloat(lowestPrice)) {
+            	lowestPrice = cardPrice;
+            }       
+        }
+        //System.out.println(cardPrice);
+        return "$" + lowestPrice;
+    }
+}

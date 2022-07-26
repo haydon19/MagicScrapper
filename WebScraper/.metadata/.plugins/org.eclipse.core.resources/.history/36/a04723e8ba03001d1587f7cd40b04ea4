@@ -1,0 +1,134 @@
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
+
+import java.io.*; // Only needed if scraping a local File.
+import java.util.*;
+import java.util.List;
+
+public class Scraper {
+
+    public Document doc = null;
+
+    public Scraper(){
+
+    }
+
+    public Scraper(List<MagicCard> cards) {
+        if(cards.size() > 0) {
+            System.out.println("Scraping process initiated: " + cards.size());
+            for (int i = 0; i < cards.size(); i++) {
+                try {
+                    doc = Jsoup.connect(cards.get(i).getURL()).get();
+                    cards.get(i).cardName = getCardName(doc);
+                    cards.get(i).price = getPrice(doc);
+                    cards.get(i).description = getDescription(doc);
+                    cards.get(i).cardImage = getCardImage(doc);
+
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                System.out.println("Scraping progress: [" + i + "]");
+            }
+        }
+    }
+
+    public void printCards(){
+
+    }
+
+
+    public List<MagicCard> queryCards(String query){
+        List<MagicCard> list = new ArrayList<MagicCard>();
+        Document queryDoc;
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+
+            if(doc.title().contains("Search")){
+                Elements cards = doc.getElementsByClass("card-grid-item");
+                int index = 0;
+                while(index < 5 && index < cards.size()){
+                    MagicCard card = new MagicCard("");
+                    String href = cards.get(index).text();
+                    try{
+                        queryDoc = Jsoup.connect("https://scryfall.com/search?q=" + href).get();
+                        card.cardName = getCardName(queryDoc);
+                        card.price = getPrice(queryDoc);
+                        card.description = getDescription(queryDoc);
+                        card.cardImage = getCardImage(queryDoc);
+                        card.url = getCardImage(queryDoc);
+                        list.add(card);
+                        index++;
+                    }catch(IOException ioe){
+                        ioe.printStackTrace();
+                    }
+                }
+            }
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+        return list;
+    }
+
+    public MagicCard getCard(String query){
+        MagicCard card = new MagicCard();
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+            card.cardName = getCardName(doc);
+            card.price = getPrice(doc);
+            card.description = getDescription(doc);
+            card.cardImage = getCardImage(doc);
+            card.url = getCardImage(doc);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+        System.out.println("completed.");
+        return card;
+    }
+
+    public String getCardImage(Document doc){
+        String cardImage = null;
+        Elements image = doc.getElementsByTag("img");
+        cardImage = image.first().attr("src");
+        //System.out.println(image.first().attr("src"));
+        return cardImage;
+    }
+
+    public String getCardName(Document doc){
+        String cardName = "";
+        Elements name = doc.getElementsByClass("card-text-card-name");
+        cardName = name.get(0).ownText();
+
+        //System.out.println(cardName);
+        return cardName;
+    }
+
+    public String getDescription(Document doc){
+        String cardDescription = "";
+        Elements price = doc.getElementsByClass("card-text-oracle");
+        cardDescription = price.get(0).text();
+
+        //System.out.println(cardDescription);
+        return cardDescription;
+    }
+
+    public String getPrice(Document doc){
+        String cardPrice = "";
+        Elements price = doc.getElementsByClass("currency-usd");
+        int cardPriceStrLength = price.get(1).text().length();
+
+        if(price.get(0).text() != "$"){
+            //System.out.println(price.get(0).text());
+            cardPrice = price.get(0).text().substring(1,cardPriceStrLength);
+        }else{
+            cardPrice = price.get(0).text().substring(0,cardPriceStrLength);
+        }
+
+
+        //System.out.println(cardPrice);
+        return cardPrice;
+    }
+
+}

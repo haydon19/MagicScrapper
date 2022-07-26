@@ -1,0 +1,98 @@
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.JList;
+import javax.swing.JToolBar;
+import javax.swing.AbstractListModel;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import net.miginfocom.swing.MigLayout;
+import java.awt.FlowLayout;
+import javax.swing.JLabel;
+
+public class MainPage extends JFrame {
+
+	private JPanel contentPane;
+	private JTextField cardListLabel;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					MainPage frame = new MainPage();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public MainPage() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+		JPanel queryListPanel = new JPanel();
+		contentPane.add(queryListPanel, BorderLayout.WEST);
+		queryListPanel.setLayout(new MigLayout("", "[96px]", "[20px][48px]"));
+		
+		cardListLabel = new JTextField();
+		cardListLabel.setText("<Enter Query>");
+		queryListPanel.add(cardListLabel, "cell 0 0,alignx left,aligny center");
+		cardListLabel.setColumns(10);
+		
+		JList cardListGUI = new JList();
+		cardListGUI.setModel(new AbstractListModel() {
+			String[] values = new String[] {"test", "test", "test"};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		queryListPanel.add(cardListGUI, "cell 0 1,alignx left,growy");
+		
+		JPanel deckPanel = new JPanel();
+		contentPane.add(deckPanel, BorderLayout.SOUTH);
+		
+		JPanel cardImage = new JPanel();
+		contentPane.add(cardImage, BorderLayout.CENTER);
+		cardImage.setLayout(new BorderLayout(0, 0));
+		
+		JPanel cardListPanel = new JPanel();
+		contentPane.add(cardListPanel, BorderLayout.EAST);
+		cardListPanel.setLayout(new BorderLayout(0, 0));
+		
+		JList list = new JList();
+		list.setModel(new AbstractListModel() {
+			String[] values = new String[] {"Test", "test", "test"};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		cardListPanel.add(list, BorderLayout.CENTER);
+		
+		JLabel lblNewLabel = new JLabel("Card List");
+		cardListPanel.add(lblNewLabel, BorderLayout.NORTH);
+	}
+
+}

@@ -1,0 +1,154 @@
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.*;
+
+import java.io.*; // Only needed if scraping a local File.
+import java.util.*;
+import java.util.List;
+
+public class Scraper {
+
+    public Document doc = null;
+
+    //Empty constructor
+    public Scraper(){}
+/*
+    public Scraper(List<MagicCard> cards) {
+        if(cards.size() > 0) {
+            System.out.println("Scraping process initiated: " + cards.size());
+            for (int i = 0; i < cards.size(); i++) {
+                try {
+                    doc = Jsoup.connect(cards.get(i).getURL()).get();
+                    cards.get(i).cardName = getCardName(doc);
+                    cards.get(i).price = getPrice(doc);
+                    cards.get(i).description = getDescription(doc);
+                    cards.get(i).cardImage = getCardImage(doc);
+
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                System.out.println("Scraping progress: [" + i + "]");
+            }
+        }
+    }
+*/
+    //Uses jSoup to query a card on scryfall.com
+    //List of 10 cards to be displayed if 10 like cards exist
+    //when the user searches for a particular card.
+    public List<MagicCard> queryCards(String query){
+        List<MagicCard> list = new ArrayList<MagicCard>();
+        Document queryDoc;
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+            if(doc.baseUri().contains("search?q=")){
+            	//This scrapes the cards displayed on scrypfall (shown via a grid). 
+                Elements cards = doc.getElementsByClass("card-grid-item");
+                int index = 0;
+                //Keep the list at less than 10 for now.
+                while(index < 10 && index < cards.size()){
+                    MagicCard card = new MagicCard("");
+                    String href = cards.get(index).text();
+                    try{
+                        queryDoc = Jsoup.connect("https://scryfall.com/search?q=" + href).get();
+                        card.cardName = getCardName(queryDoc);
+                        card.price = getPrice(queryDoc);
+                        card.description = getDescription(queryDoc);
+                        card.cardImage = getCardImage(queryDoc);
+                        card.url = getCardImage(queryDoc);
+                        list.add(card);
+                        index++;
+                    }catch(Exception ex){
+                        System.out.println(ex.toString());
+                    }
+                }
+            }else {
+            	//We have found the card you are looking for
+            	MagicCard card = new MagicCard("");
+            	System.out.println("Document URL: " + doc.baseUri());
+                card.cardName = getCardName(doc);
+                card.price = getPrice(doc);
+                card.description = getDescription(doc);
+                card.cardImage = getCardImage(doc);
+                card.url = getCardImage(doc);
+                list.add(card);
+            }
+        }catch(Exception ex){
+            System.out.println(ex.toString());
+        }
+        System.out.println("completed.");
+        return list;
+    }
+
+    //Get a magic card by scraping data from scryfall's database.
+    public MagicCard getCard(String query){
+        MagicCard card = new MagicCard();
+        try{
+            System.out.print("Scraping card data...");
+            doc = Jsoup.connect("https://scryfall.com/search?q=" + query).get();
+            card.cardName = getCardName(doc);
+            card.price = getPrice(doc);
+            card.description = getDescription(doc);
+            card.cardImage = getCardImage(doc);
+            card.url = getCardImage(doc);
+        }catch(Exception ex){
+            System.out.println(ex.toString());
+        }
+        System.out.println("completed.");
+        return card;
+    }
+    
+    //Gets the card image link.
+    //This link is used to display the cards image.
+    public String getCardImage(Document doc){
+        String cardImage = null;
+        Elements image = doc.getElementsByTag("img");
+        cardImage = image.first().attr("src");
+        //System.out.println(image.first().attr("src"));
+        return cardImage;
+    }
+
+    //Get the cards top most name.
+    public String getCardName(Document doc){
+        String cardName = "";
+        try {
+        Elements name = doc.getElementsByClass("card-text-card-name");
+        cardName = name.get(0).ownText();
+        return cardName;
+        }
+        catch(Exception ex) {
+        	return ex.toString();
+        }
+    }
+    //Get description of the scryfall magic card.
+    public String getDescription(Document doc){
+        String cardDescription = "";
+        Elements price = doc.getElementsByClass("card-text-oracle");
+        cardDescription = price.get(0).text();
+
+        return cardDescription;
+    }
+
+    //Get the cheapest price of the scryfall magic card.
+    //TODO: Magic Arena has implemented a new variant called Alchemy that sometimes fails to fetch a price,
+    //as these cards don't physically exist and don't have a price.
+    public String getPrice(Document doc){
+        String cardPrice = "";
+        String lowestPrice = "";
+        Elements price = doc.getElementsByClass("currency-usd");
+        //Grab the cheapest price.
+        for(int i=0;i<price.size();i++) {
+        	//Get the string for the price.
+        	int cardPriceStrLength = price.get(i).text().length();
+        	cardPrice = price.get(i).text().substring(price.get(i).text().indexOf("$") + 1,cardPriceStrLength);
+        	
+            if(lowestPrice.isEmpty()) {
+            	lowestPrice = cardPrice;
+            }
+            else if(Float.parseFloat(cardPrice) < Float.parseFloat(lowestPrice)) {
+            	lowestPrice = cardPrice;
+            }       
+        }
+        return "$" + lowestPrice;
+    }
+}
